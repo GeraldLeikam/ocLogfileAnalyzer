@@ -2,10 +2,8 @@ from PyQt5 import QtWidgets
 from modules.QItems import TableItem
 from modules.dataFromJson import convertDataStrinListFromJson
 from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QWidget
-
+from os.path import expanduser
 from PyQt5.uic import loadUi
-import sys
 
 
 
@@ -82,7 +80,7 @@ class Ui(QtWidgets.QMainWindow):
         self.filterButton.clicked.connect(self.filterButtonFunction)
 
     def openButtonFunction(self):
-        fileName = QFileDialog.getOpenFileName(self, 'Select LogFile to load')[0]
+        fileName = QFileDialog.getOpenFileName(self, 'Select LogFile to load', expanduser('~'))[0]
         if fileName != '':
             self.setWindowTitle(f'{self.title} - {fileName}')
             fileData = self.readFile(fileName=fileName)
