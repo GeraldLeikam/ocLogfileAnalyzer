@@ -1,13 +1,15 @@
 from PyQt5 import QtWidgets
 import sys
-from modules.dataFromJson import convertDataStrinListFromJson
+import os
 from modules.ui import Ui
 
 class Main:
 
     def __init__(self):
+        c_dir = os.getcwd()
+        print(c_dir)
         self.app = QtWidgets.QApplication(sys.argv)
-        self.window = Ui(uiTemplate='./ui/main.ui')
+        self.window = Ui(uiTemplate=f'{c_dir}/ui/main.ui')
 
         sys.exit(self.app.exec_())
 
