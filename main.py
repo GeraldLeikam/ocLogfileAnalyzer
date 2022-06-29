@@ -21,9 +21,9 @@ print(os.getcwd())
 class Main:
 
     def __init__(self):
-        appImagePath = '/tmp/.mount_PythonFsLV00/usr/bin'
+        appImagePath = os.getcwd()
         self.app = QtWidgets.QApplication(sys.argv)
-        self.window = Ui(uiTemplate=f'{appImagePath}/ui/main.ui')
+        self.window = Ui(uiTemplate=f'{appImagePath}/bin/ui/main.ui')
 
         sys.exit(self.app.exec_())
 
