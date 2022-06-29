@@ -4,6 +4,13 @@ import sys
 import os
 from modules.ui import Ui
 
+def find(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+
+print(find('main.ui', '/'))
+
 class Main:
 
     def __init__(self):
@@ -14,4 +21,4 @@ class Main:
         sys.exit(self.app.exec_())
 
 
-Main()
+
