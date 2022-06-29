@@ -4,8 +4,6 @@ import sys
 import os
 from modules.ui import Ui
 
-print(os.getcwd())
-
 class Main:
 
     def __init__(self):
