@@ -21,11 +21,15 @@ print(os.getcwd())
 class Main:
 
     def __init__(self):
-        appImagePath = os.getcwd()
         self.app = QtWidgets.QApplication(sys.argv)
-        self.window = Ui(uiTemplate=f'{appImagePath}/bin/ui/main.ui')
-
+        try:
+            self.window = Ui(uiTemplate=f'./ui/main.ui')
+        except:
+            self.window = Ui(uiTemplate=f'{os.getcwd()}/bin/ui/main.ui')
         sys.exit(self.app.exec_())
+
+Main()
+
 
 
 
