@@ -7,10 +7,9 @@ from modules.ui import Ui
 class Main:
 
     def __init__(self):
-        c_dir = os.getcwd()
-        print(c_dir)
+        appImagePath = 'usr/bin'
         self.app = QtWidgets.QApplication(sys.argv)
-        self.window = Ui(uiTemplate=f'{c_dir}/ui/main.ui')
+        self.window = Ui(uiTemplate=f'{appImagePath}/ui/main.ui')
 
         sys.exit(self.app.exec_())
 
