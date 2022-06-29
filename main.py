@@ -12,8 +12,11 @@ def find_all(name, path):
             result.append(os.path.join(root, name))
     return result
 
-#for line in find_all('main.ui', '/'):
-#    print(line)
+for line in find_all('main.ui', '/'):
+    print(line)
+
+print('================================================================')
+print(os.getcwd())
 
 class Main:
 
@@ -26,4 +29,3 @@ class Main:
 
 
 
-Main()
