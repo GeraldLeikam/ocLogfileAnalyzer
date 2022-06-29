@@ -4,20 +4,6 @@ import sys
 import os
 from modules.ui import Ui
 
-
-def find_all(name, path):
-    result = []
-    for root, dirs, files in os.walk(path):
-        if name in files:
-            result.append(os.path.join(root, name))
-    return result
-
-for line in find_all('main.ui', '/'):
-    print(line)
-
-print('================================================================')
-print(os.getcwd())
-
 class Main:
 
     def __init__(self):
