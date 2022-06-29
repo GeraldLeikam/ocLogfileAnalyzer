@@ -4,6 +4,8 @@ import sys
 import os
 from modules.ui import Ui
 
+print(os.getcwd())
+
 class Main:
 
     def __init__(self):
@@ -11,7 +13,7 @@ class Main:
         try:
             self.window = Ui(uiTemplate=f'./ui/main.ui')
         except:
-            self.window = Ui(uiTemplate=f'{os.getcwd()}/bin/ui/main.ui')
+            self.window = Ui(uiTemplate=f'{os.getcwd()}/bin/ocLogfileAnalyzer/ui/main.ui')
         sys.exit(self.app.exec_())
 
 Main()
