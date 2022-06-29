@@ -12,13 +12,13 @@ def find_all(name, path):
             result.append(os.path.join(root, name))
     return result
 
-for line in find_all('main.ui', '/'):
-    print(line)
+#for line in find_all('main.ui', '/'):
+#    print(line)
 
 class Main:
 
     def __init__(self):
-        appImagePath = 'usr/bin'
+        appImagePath = '/tmp/.mount_PythonFsLV00/usr/bin'
         self.app = QtWidgets.QApplication(sys.argv)
         self.window = Ui(uiTemplate=f'{appImagePath}/ui/main.ui')
 
