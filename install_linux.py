@@ -1,7 +1,8 @@
 import os
 
 def install_linux_mint(os_release):
-    if os_release['VERSION_ID'] == '20.3':
+    if os_release['VERSION_ID'].strip('"') == '20.3':
+        print('OS identified as Linux Mint 20.3')
         command = 'apt install -y'
         needed_packages = ['python3-pyqt5']
         for package in needed_packages:
@@ -10,6 +11,9 @@ def install_linux_mint(os_release):
         print(f'Running command: {command}')
         cmd_out = os.popen(command)
         print(cmd_out.read())
+
+print('Starting install process ...')
+print('Identifying OS')
 
 with open('/etc/os-release', 'r') as reader:
     os_release_read = reader.readlines()
