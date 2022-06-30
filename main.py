@@ -10,6 +10,7 @@ if __name__ == '__main__':
     try:
         window = Ui(uiTemplate=f'{path}/ui/main.ui')
     except:
+        print(__file__)
         print(path)
         window = Ui(uiTemplate=f'{os.getcwd()}/bin/ocLogfileAnalyzer/ui/main.ui') #used for appImage
     sys.exit(app.exec_())
