@@ -4,18 +4,13 @@ import sys
 import os
 from modules.ui import Ui
 
-class Main:
-
-    def __init__(self):
-        self.app = QtWidgets.QApplication(sys.argv)
-        try:
-            self.window = Ui(uiTemplate=f'./ui/main.ui')
-        except:
-            self.window = Ui(uiTemplate=f'{os.getcwd()}/bin/ocLogfileAnalyzer/ui/main.ui')
-        sys.exit(self.app.exec_())
-
-Main()
-
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    try:
+        window = Ui(uiTemplate=f'./ui/main.ui')
+    except:
+        window = Ui(uiTemplate=f'{os.getcwd()}/bin/ocLogfileAnalyzer/ui/main.ui') #used for appImage
+    sys.exit(app.exec_())
 
 
 
