@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 
 def install_linux_mint(os_release):
