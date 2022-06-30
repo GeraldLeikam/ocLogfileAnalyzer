@@ -6,9 +6,11 @@ def install_linux_mint(os_release):
         needed_packages = ['python3-pyqt5']
         for package in needed_packages:
             command = f'{command} {package}'
+        print('Install nessesary packages ...')
+        print(f'Running command: {command}')
         cmd_out = os.popen(command)
         print(cmd_out.read())
-        
+
 with open('/etc/os-release', 'r') as reader:
     os_release_read = reader.readlines()
 
