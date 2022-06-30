@@ -5,10 +5,12 @@ import os
 from modules.ui import Ui
 
 if __name__ == '__main__':
+    path = __file__.strip(__file__.split('/')[len(__file__.split('/'))-1])
     app = QtWidgets.QApplication(sys.argv)
     try:
-        window = Ui(uiTemplate=f'./ui/main.ui')
+        window = Ui(uiTemplate=f'{path}/ui/main.ui')
     except:
+        print(path)
         window = Ui(uiTemplate=f'{os.getcwd()}/bin/ocLogfileAnalyzer/ui/main.ui') #used for appImage
     sys.exit(app.exec_())
 
