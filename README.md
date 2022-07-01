@@ -1,4 +1,4 @@
-# ocLogfileAnalyzer
+# ocLogfileAnalyzer testing
 
 ## Manual Installation
 
@@ -25,13 +25,19 @@ chmod +x install_linux.py
 
 ## AppImage
 
+```
+    AppImage tested on following distributions:
+    
+    Linux Mint 20.3 (Una) Cinnamon Edition
+```
+
 Download the latest release of AppImage on your system and run:
 
 ```
-chmod +x ocLogfileAnalyzer_v*
+chmod +x ocLogfileAnalyzer_testing*
 ```
 Run the appImage:
 
 ```
-./ocLogfileAnalyzer_v*
+./ocLogfileAnalyzer_testing*
 ```

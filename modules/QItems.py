@@ -15,7 +15,7 @@ Alignments
 
 class TableItem(QTableWidgetItem):
 
-    def __init__(self, txt='', fontFamily='Ubuntu', fontSize=10, setBold=False, color=QColor(0, 0, 0), alignment=0, tableField=None):
+    def __init__(self, txt='', fontFamily='Ubuntu', fontSize=10, setBold=False, color=QColor(0, 0, 0), fontSet=None, alignment=0, tableField=None):
         super().__init__()
         self.tableField = tableField
         self.txt = txt
@@ -23,8 +23,10 @@ class TableItem(QTableWidgetItem):
         self.fontFamily = fontFamily
         self.fontSize = fontSize
         self.setTextAlignment(alignment)
-
-        self.font = QFont(self.fontFamily, self.fontSize)
+        if fontSet is not None:
+            self.font = fontSet
+        else:
+            self.font = QFont(self.fontFamily, self.fontSize)
         self.font.setBold(setBold)
         #fontMetrics = QFontMetrics(self.font)
 
