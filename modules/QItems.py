@@ -15,31 +15,36 @@ Alignments
 
 class TableItem(QTableWidgetItem):
 
-    def __init__(self, txt='', fontFamily='Ubuntu', fontSize=10, setBold=False, color=QColor(0, 0, 0), fontSet=None, alignment=0, tableField=None):
+    def __init__(self, txt='', fontFamily='Ubuntu', fontSize=10, setBold=False, color=QColor(0, 0, 0), alignment=0, tableColumn=None):
         super().__init__()
-        self.tableField = tableField
+        self.tableColumn = tableColumn
         self.txt = txt
-        self.stringLength = len(txt)
         self.fontFamily = fontFamily
         self.fontSize = fontSize
         self.setTextAlignment(alignment)
-        if fontSet is not None:
-            self.font = fontSet
-        else:
-            self.font = QFont(self.fontFamily, self.fontSize)
+
+        self.font = QFont(self.fontFamily, self.fontSize)
         self.font.setBold(setBold)
-        #fontMetrics = QFontMetrics(self.font)
 
         self.setForeground(color)
         self.setFont(self.font)
         self.setText(self.txt)
 
-        #self.itemWidth = fontMetrics.width(self.txt)
-        #self.itemHeight = fontMetrics.height()
+    def getStringLength(self):
+        if self.txt == '':
+            return len(self.tableColumn)
+        else:
+            if len(self.txt) > len(self.tableColumn):
+                return len(self.txt)
+            else:
+                return len(self.tableColumn)
 
     def getItemLengthSizeInPixel(self):
         fontMetrics = QFontMetrics(self.font)
-        if self.txt == '':
-            return fontMetrics.width(self.tableField)
+        if self.txt == '' or self.txt == None:
+            return fontMetrics.width(self.tableColumn)
         else:
-            return fontMetrics.width(self.txt)
+            if len(self.txt) > len(self.tableColumn):
+                return fontMetrics.width(self.txt)
+            else:
+                return fontMetrics.width(self.tableColumn)

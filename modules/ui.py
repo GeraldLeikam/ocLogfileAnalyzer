@@ -1,357 +1,205 @@
 from PyQt5 import QtWidgets
 from modules.QItems import TableItem
-from modules.dataFromJson import convertDataStrinListFromJson
 from PyQt5.QtWidgets import QFileDialog
 from os.path import expanduser
 from PyQt5.uic import loadUi
-
-
+from modules.uiFunctions import setUITitle
+from modules.uiFunctions import readFile
+from modules.uiFunctions import createRecordList
+from modules.uiFunctions import filter
 
 class Ui(QtWidgets.QMainWindow):
 
     parsedData = None
     title = 'oC 10 Logfile Analyzer'
 
+    columnHeaders = [
+        TableItem(txt='ID', tableColumn='ID'),
+        TableItem(txt='Request ID', tableColumn='Request ID'),
+        TableItem(txt='Level', tableColumn='Level'),
+        TableItem(txt='Date', tableColumn='Date'),
+        TableItem(txt='Time', tableColumn='Time'),
+        TableItem(txt='Remote Address', tableColumn='Remote Address'),
+        TableItem(txt='User', tableColumn='User'),
+        TableItem(txt='App', tableColumn='App'),
+        TableItem(txt='Method', tableColumn='Method'),
+        TableItem(txt='URL', tableColumn='URL'),
+        TableItem(txt='Message', tableColumn='Message'),
+    ]
+
     def __init__(self, uiTemplate):
         super(Ui, self).__init__() # Call the inherited classes __init__ method
         loadUi(uiTemplate, self) # Load the .ui file
-        self.setWindowTitle(f'{self.title}')
-        self.tableHeaders = [
-            TableItem(txt='Request ID'),
-            TableItem(txt='Level'),
-            TableItem(txt='Date'),
-            TableItem(txt='Time'),
-            TableItem(txt='Remote Address'),
-            TableItem(txt='User'),
-            TableItem(txt='App'),
-            TableItem(txt='Method'),
-            TableItem(txt='Url'),
-            TableItem(txt='Message'),
-        ]
+
+        setUITitle(uiElement=self, title=f'{self.title}')
         self.setGUIObjects()
+        self.configureTableWidget()
         self.show()
 
     def setGUIObjects(self):
         self.dataTable = self.findChild(QtWidgets.QTableWidget, 'dataTable')
-        self.setDataTableHeaders()
+
+        self.uiFilterListViews = {
+            'reqId': self.findChild(QtWidgets.QListView, 'requestIdListView'),
+            'level': self.findChild(QtWidgets.QListView, 'levelListView'),
+            'date': None,
+            'time': None,
+            'remoteAddr': None,
+            'user': self.findChild(QtWidgets.QListView, 'userListView'),
+            'app': self.findChild(QtWidgets.QListView, 'appsListView'),
+            'method': self.findChild(QtWidgets.QListView, 'methodListView'),
+            'url': None,
+            'message': None
+        }
+        self.uiFilterTextEdits = {
+            'reqId': self.findChild(QtWidgets.QTextEdit, 'requestIdTextEdit'),
+            'date': None,
+            'time': None,
+            'remoteAddr': None,
+            'user': self.findChild(QtWidgets.QTextEdit, 'userTextEdit'),
+            'app': self.findChild(QtWidgets.QTextEdit, 'appTextEdit'),
+            'url': None,
+            'message': None
+        }
+        self.uiFilterComboBoxes = {
+            'level': self.findChild(QtWidgets.QComboBox, 'levelComboBox'),
+            'method': self.findChild(QtWidgets.QComboBox, 'methodComboBox')
+        }
+        self.uiFilterAddButtons = {
+            'reqId': self.findChild(QtWidgets.QPushButton, 'requestIdAddButton'),
+            'level': self.findChild(QtWidgets.QPushButton, 'levelAddButton'),
+            'user': self.findChild(QtWidgets.QPushButton, 'userAddButton'),
+            'app': self.findChild(QtWidgets.QPushButton, 'appAddButton'),
+            'method': self.findChild(QtWidgets.QPushButton, 'methodAddButton'),
+        }
+
+        self.uiFilterRemoveButtons = {
+            'reqId': self.findChild(QtWidgets.QPushButton, 'requestIdRemoveButton'),
+            'level': self.findChild(QtWidgets.QPushButton, 'levelRemoveButton'),
+            'user': self.findChild(QtWidgets.QPushButton, 'userRemoveButton'),
+            'app': self.findChild(QtWidgets.QPushButton, 'appRemoveButton'),
+            'method': self.findChild(QtWidgets.QPushButton, 'methodRemoveButton')
+        }
 
         self.openButton = self.findChild(QtWidgets.QPushButton, 'openButton')
-
-        self.requestIdTextEdit = self.findChild(QtWidgets.QTextEdit, 'requestIdTextEdit')
-        self.requestIdListView = self.findChild(QtWidgets.QListView, 'requestIdListView')
-        self.requestIdAddButton = self.findChild(QtWidgets.QPushButton, 'requestIdAddButton')
-        self.requestIdRemoveButton = self.findChild(QtWidgets.QPushButton, 'requestIdRemoveButton')
-
-        self.levelAddButton = self.findChild(QtWidgets.QPushButton, 'levelAddButton')
-        self.levelRemoveButton = self.findChild(QtWidgets.QPushButton, 'levelRemoveButton')
-        self.levelComboBox = self.findChild(QtWidgets.QComboBox, 'levelComboBox')
-        self.levelListView = self.findChild(QtWidgets.QListView, 'levelListView')
-
-        self.userAddButton = self.findChild(QtWidgets.QPushButton, 'userAddButton')
-        self.userRemoveButton = self.findChild(QtWidgets.QPushButton, 'userRemoveButton')
-        self.userTextEdit = self.findChild(QtWidgets.QTextEdit, 'userTextEdit')
-        self.userListView = self.findChild(QtWidgets.QListView, 'userListView')
-
-        self.appAddButton = self.findChild(QtWidgets.QPushButton, 'appAddButton')
-        self.appRemoveButton = self.findChild(QtWidgets.QPushButton, 'appRemoveButton')
-        self.appAddTextEdit = self.findChild(QtWidgets.QTextEdit, 'appAddTextEdit')
-        self.appsListView = self.findChild(QtWidgets.QListView, 'appsListView')
-
-        self.methodAddButton = self.findChild(QtWidgets.QPushButton, 'methodAddButton')
-        self.methodRemoveButton = self.findChild(QtWidgets.QPushButton, 'methodRemoveButton')
-        self.methodComboBox = self.findChild(QtWidgets.QComboBox, 'methodComboBox')
-        self.methodListView = self.findChild(QtWidgets.QListView, 'methodListView')
 
         self.filterButton = self.findChild(QtWidgets.QPushButton, 'filterButton')
 
         self.rowsCountLabel = self.findChild(QtWidgets.QLabel, 'rowsCountLabel')
 
         self.openButton.clicked.connect(self.openButtonFunction)
-        self.requestIdAddButton.clicked.connect(self.requestIdAddButtonFunction)
-        self.requestIdRemoveButton.clicked.connect(self.requestIdRemoveButtonFunction)
-        self.levelAddButton.clicked.connect(self.levelAddButtonFunction)
-        self.levelRemoveButton.clicked.connect(self.levelRemoveButtonFunction)
-        self.userAddButton.clicked.connect(self.userAddButtonFunction)
-        self.userRemoveButton.clicked.connect(self.userRemoveButtonFunction)
-        self.appAddButton.clicked.connect(self.appAddButtonFunction)
-        self.appRemoveButton.clicked.connect(self.appRemoveButtonFunction)
-        self.methodAddButton.clicked.connect(self.methodAddButtonFunction)
-        self.methodRemoveButton.clicked.connect(self.methodRemoveButtonFunction)
+
+        self.uiFilterAddButtons['reqId'].clicked.connect(lambda: self.addButtonFunction(filter='reqId'))
+        self.uiFilterAddButtons['level'].clicked.connect(lambda: self.addButtonFunction(filter='level'))
+        self.uiFilterAddButtons['user'].clicked.connect(lambda: self.addButtonFunction(filter='user'))
+        self.uiFilterAddButtons['app'].clicked.connect(lambda: self.addButtonFunction(filter='app'))
+        self.uiFilterAddButtons['method'].clicked.connect(lambda: self.addButtonFunction(filter='method'))
+
+        self.uiFilterRemoveButtons['reqId'].clicked.connect(lambda: self.removeButtonFunction(filter='reqId'))
+        self.uiFilterRemoveButtons['level'].clicked.connect(lambda: self.removeButtonFunction(filter='level'))
+        self.uiFilterRemoveButtons['user'].clicked.connect(lambda: self.removeButtonFunction(filter='user'))
+        self.uiFilterRemoveButtons['app'].clicked.connect(lambda: self.removeButtonFunction(filter='app'))
+        self.uiFilterRemoveButtons['method'].clicked.connect(lambda: self.removeButtonFunction(filter='method'))
+
         self.filterButton.clicked.connect(self.filterButtonFunction)
 
+    def configureTableWidget(self):
+
+        self.dataTable.setColumnCount(len(self.columnHeaders))
+        for column in range(0, len(self.columnHeaders)):
+            self.dataTable.setHorizontalHeaderItem(column, self.columnHeaders[column])
+            self.dataTable.setColumnWidth(column, self.columnHeaders[column].getItemLengthSizeInPixel() + 20)
+        self.dataTable.setColumnHidden(0, True)
+
     def openButtonFunction(self):
-        fileName = QFileDialog.getOpenFileName(self, 'Select LogFile to load', expanduser('~'))[0]
-        if fileName != '':
-            self.setWindowTitle(f'{self.title} - {fileName}')
-            fileData = self.readFile(fileName=fileName)
-            self.parsedData = self.parseData(data=fileData)
+        file = QFileDialog.getOpenFileName(self, 'Select LogFile to load', expanduser('~'))[0]
+        if file != '':
+            setUITitle(self, f'{self.title} - {file}')
+            data = readFile(file=file)
+            self.dataGood = []
+            self.dataFailed = []
+            if data is not None:
+                for data in createRecordList(data):
+                    if data.parseSuccess:
+                        self.dataGood.append(data)
+                    else:
+                        self.dataFailed.append(data)
+            self.loadData(dataList=self.dataGood)
 
-            self.loadData(self.parsedData['succeeded'])
+    def addButtonFunction(self, filter=None):
+        if filter in self.uiFilterTextEdits.keys():
+            filterCriteria = self.uiFilterTextEdits[filter].toPlainText()
+            self.uiFilterTextEdits[filter].setText('')
+        if filter in self.uiFilterComboBoxes.keys():
+            filterCriteria = self.uiFilterComboBoxes[filter].currentText()
+            self.uiFilterComboBoxes[filter].setCurrentText(self.uiFilterComboBoxes[filter].itemText(0))
 
-    def requestIdAddButtonFunction(self):
-        requestID = self.requestIdTextEdit.toPlainText()
-        if requestID != '':
+        if filterCriteria != '':
             found = False
-            for i in range(0, self.requestIdListView.count()):
-                if self.requestIdListView.item(i).text().lower() == requestID.lower():
+            for i in range(0, self.uiFilterListViews[filter].count()):
+                if self.uiFilterListViews[filter].item(i).text().lower() == filterCriteria.lower():
                     found = True
                     break
-            if found != True:
-                self.requestIdListView.addItem(requestID)
-        self.requestIdTextEdit.setText('')
+            if found == False:
+                self.uiFilterListViews[filter].addItem(filterCriteria)
+            self.uiFilterListViews[filter].item(0).setSelected(True)
 
-    def requestIdRemoveButtonFunction(self):
-        index = self.requestIdListView.currentRow()
-        self.requestIdListView.takeItem(index)
-
-    def levelAddButtonFunction(self):
-        level = self.levelComboBox.currentText()
-        found = False
-        for i in range(0, self.levelListView.count()):
-            if self.levelListView.item(i).text().lower() == level.lower():
-                found = True
-                break
-        if found != True:
-            self.levelListView.addItem(level)
-        self.levelComboBox.setCurrentText('0')
-
-    def levelRemoveButtonFunction(self):
-        index = self.levelListView.currentRow()
-        self.levelListView.takeItem(index)
-
-    def userAddButtonFunction(self):
-        userName = self.userTextEdit.toPlainText()
-        if userName != '':
-            found = False
-            for i in range(0, self.userListView.count()):
-                if self.userListView.item(i).text().lower() == userName.lower():
-                    found = True
-                    break
-            if found != True:
-                self.userListView.addItem(userName)
-        self.userTextEdit.setText('')
-
-    def userRemoveButtonFunction(self):
-        index = self.userListView.currentRow()
-        self.userListView.takeItem(index)
-
-    def appAddButtonFunction(self):
-        appName = self.appAddTextEdit.toPlainText()
-        if appName != '':
-            found = False
-            for i in range(0, self.appsListView.count()):
-                if self.appsListView.item(i).text().lower() == appName.lower():
-                    found = True
-                    break
-            if found != True:
-                self.appsListView.addItem(appName)
-        self.appAddTextEdit.setText('')
-
-    def appRemoveButtonFunction(self):
-        index = self.appsListView.currentRow()
-        self.appsListView.takeItem(index)
-
-    def methodAddButtonFunction(self):
-        method = self.methodComboBox.currentText()
-        found = False
-        for i in range(0, self.methodListView.count()):
-            if self.methodListView.item(i).text().lower() == method.lower():
-                found = True
-                break
-        if found != True:
-            self.methodListView.addItem(method)
-        self.methodComboBox.setCurrentText('POST')
-
-    def methodRemoveButtonFunction(self):
-        index = self.methodListView.currentRow()
-        self.methodListView.takeItem(index)
+    def removeButtonFunction(self, filter=None):
+        index = self.uiFilterListViews[filter].currentIndex().row()
+        if index == -1:
+            index = 0
+        self.uiFilterListViews[filter].takeItem(index)
+        if self.uiFilterListViews[filter].count() > 0:
+            self.uiFilterListViews[filter].item(0).setSelected(True)
 
     def filterButtonFunction(self):
-        if self.parsedData != None:
-            dataList = self.parsedData['succeeded']
+        if self.dataGood != None:
 
-            requestIdToFilter = []
-            for i in range(0, self.requestIdListView.count()):
-                requestIdToFilter.append(self.requestIdListView.item(i).text())
+            filterCriterias = {
+                'reqId': [],
+                'level': [],
+                'date': [],
+                'time': [],
+                'remoteAddr': [],
+                'user': [],
+                'app': [],
+                'method': [],
+                'url': [],
+                'message': []
+            }
 
-            levelToFilter = []
-            for i in range(0, self.levelListView.count()):
-                levelToFilter.append(self.levelListView.item(i).text())
+            for listView in self.uiFilterListViews:
+                if self.uiFilterListViews[listView] != None:
+                    for row in range(0, self.uiFilterListViews[listView].count()):
+                        filterCriterias[listView].append(self.uiFilterListViews[listView].item(row).text())
 
-            userToFilter = []
-            for i in range(0, self.userListView.count()):
-                userToFilter.append(self.userListView.item(i).text())
-
-            appsToFilter = []
-            for i in range(0, self.appsListView.count()):
-                appsToFilter.append(self.appsListView.item(i).text())
-
-            methodsToFilter = []
-            for i in range(0, self.methodListView.count()):
-                methodsToFilter.append(self.methodListView.item(i).text())
-
-            templist = []
-            if len(userToFilter) > 0:
-                for data in dataList:
-                    for user in userToFilter:
-                        if str(data['user']).lower() == str(user).lower():
-                            templist.append(data)
-                dataList = templist
-
-            templist =[]
-            if len(requestIdToFilter) > 0:
-                for data in dataList:
-                    for id in requestIdToFilter:
-                        if str(data['reqId']).lower() == str(id).lower():
-                            templist.append(data)
-                dataList = templist
-
-            templist = []
-            if len(levelToFilter) > 0:
-                for data in dataList:
-                    for level in levelToFilter:
-                        if str(data['level']).lower() == str(level).lower():
-                            templist.append(data)
-                dataList = templist
-
-            tempList = []
-            if len(appsToFilter) > 0:
-                for data in dataList:
-                    for appName in appsToFilter:
-                        if data['app'].lower() == appName.lower():
-                            tempList.append(data)
-                dataList = tempList
-
-            tempList = []
-            if len(methodsToFilter) > 0:
-                for data in dataList:
-                    for method in methodsToFilter:
-                        if data['method'].lower() == method.lower():
-                            tempList.append(data)
-                dataList = tempList
-
-            self.loadData(dataList)
-
-
-    def readFile(self, fileName):
-        try:
-            with open(fileName, 'r') as reader:
-                return reader.read().split('\n')
-        except:
-            print('can not read file: ' + fileName)
-            return None
-
-    def parseData(self, data):
-        try:
-            return convertDataStrinListFromJson(data)
-        except:
-            print('cannot parse data from json')
-            return None
-
-    def setDataTableHeaders(self):
-        for i in range(0, len(self.tableHeaders)):
-            self.dataTable.setHorizontalHeaderItem(i, self.tableHeaders[i])
-            self.dataTable.setColumnWidth(i, self.tableHeaders[i].getItemLengthSizeInPixel() + 10)
+            self.loadData(filter(data=self.dataGood, filterCriterias=filterCriterias))
 
     def loadData(self, dataList):
-        self.setDataTableHeaders()
-
-        row = 0
-
-        requestIdColumnWidth = 0
-        levelColumnWidth = 15
-        dateColumnWidth = 0
-        timeColumnWidth = 0
-        remoteAddressColumnWidth = 0
-        userColumnWidth = 0
-        appColumnWidth = 0
-        methodColumnWidth = 0
-        urlColumnWidth = 0
-        messageColumnWidth = 0
-
-        requestIdColumnWidthObject = TableItem(tableField='Request ID',)
-        dateColumnWidthObject = TableItem(tableField='Date')
-        timeColumnWidthObject = TableItem(tableField='Time')
-        remoteAddressColumnWidthObject = TableItem(tableField='Remote Address')
-        userColumnWidthObject = TableItem(tableField='User')
-        appColumnWidthObject = TableItem(tableField='App')
-        methodColumnWidthObject = TableItem(tableField='Method')
-        urlColumnWidthObject = TableItem(tableField='Url')
-        messageColumnWidthObject = TableItem(tableField='Message')
+        self.configureTableWidget()
+        tableColumns = {
+            'ID': 0,
+            'reqId': 0,
+            'level': 0,
+            'date': 0,
+            'time': 0,
+            'remoteAddr': 0,
+            'user': 0,
+            'app': 0,
+            'method': 0,
+            'url': 0,
+            'message': 0
+        }
 
         self.dataTable.setRowCount(len(dataList))
-        for data in dataList:
-
-            reqId = TableItem(txt=str(data['reqId']), tableField='Request Id')
-            level = TableItem(txt=str(data['level']), tableField='Level')
-            date = TableItem(txt=str(data['date']), tableField='Date')
-            time = TableItem(txt=str(data['time']), tableField='Time')
-            remoteAddr = TableItem(txt=str(data['remoteAddr']), tableField='Remote Address')
-            user = TableItem(txt=str(data['user']), tableField='User')
-            app = TableItem(txt=str(data['app']), tableField='App')
-            method = TableItem(txt=str(data['method']), tableField='Method')
-            url = TableItem(txt=str(data['url']).strip(' '), tableField='Url')
-            message = TableItem(txt=str(data['message']), tableField='Message')
-
-            self.dataTable.setItem(row, 0, reqId)
-            self.dataTable.setItem(row, 1, level)
-            self.dataTable.setItem(row, 2, date)
-            self.dataTable.setItem(row, 3, time)
-            self.dataTable.setItem(row, 4, remoteAddr)
-            self.dataTable.setItem(row, 5, user)
-            self.dataTable.setItem(row, 6, app)
-            self.dataTable.setItem(row, 7, method)
-            self.dataTable.setItem(row, 8, url)
-            self.dataTable.setItem(row, 9, message)
-
-            if reqId.stringLength > requestIdColumnWidth:
-                requestIdColumnWidth = reqId.stringLength
-                requestIdColumnWidthObject = reqId
-
-            if date.stringLength > dateColumnWidth:
-                dateColumnWidth = date.stringLength
-                dateColumnWidthObject = date
-
-            if time.stringLength > timeColumnWidth:
-                timeColumnWidth = time.stringLength
-                timeColumnWidthObject = time
-
-            if remoteAddr.stringLength > remoteAddressColumnWidth:
-                remoteAddressColumnWidth = remoteAddr.stringLength
-                remoteAddressColumnWidthObject = remoteAddr
-
-            if user.stringLength > userColumnWidth:
-                userColumnWidth = user.stringLength
-                userColumnWidthObject = user
-
-            if app.stringLength > appColumnWidth:
-                appColumnWidth = app.stringLength
-                appColumnWidthObject = app
-
-            if method.stringLength > methodColumnWidth:
-                methodColumnWidth = method.stringLength
-                methodColumnWidthObject = method
-
-            if url.stringLength > urlColumnWidth:
-                urlColumnWidth = url.stringLength
-                urlColumnWidthObject = url
-
-            if message.stringLength > messageColumnWidth:
-                messageColumnWidth = message.stringLength
-                messageColumnWidthObject = message
-
-            row += 1
-
-        self.dataTable.setColumnWidth(0, requestIdColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the reqId column
-        self.dataTable.setColumnWidth(1, levelColumnWidth)  # Set the width of the level column
-        self.dataTable.setColumnWidth(2, dateColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the date column
-        self.dataTable.setColumnWidth(3, timeColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the time column
-        self.dataTable.setColumnWidth(4, remoteAddressColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the remoteAddress column
-        self.dataTable.setColumnWidth(5, userColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the user column
-        self.dataTable.setColumnWidth(6, appColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the app column
-        self.dataTable.setColumnWidth(7, methodColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the method column
-        self.dataTable.setColumnWidth(8, urlColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the url column
-        self.dataTable.setColumnWidth(9, messageColumnWidthObject.getItemLengthSizeInPixel() + 10)  # Set the width of the message column
+        for row in range(0, len(dataList)):
+            record = dataList[row]
+            for column in range(0, len(tableColumns)):
+                item = record.getTableItemObject(attribute=list(tableColumns)[column])
+                self.dataTable.setItem(row, column, item)
+                if item.getStringLength() > tableColumns[list(tableColumns)[column]]:
+                    tableColumns[list(tableColumns)[column]] = item.getStringLength()
+                    self.dataTable.setColumnWidth(column, item.getItemLengthSizeInPixel() + 20)
 
         self.rowsCountLabel.setText(f'Rows: {len(dataList)}')
 
