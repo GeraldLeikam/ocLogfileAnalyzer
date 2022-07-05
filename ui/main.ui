@@ -14,6 +14,9 @@
    <string>oC Logfile Analyzer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
    <widget class="QPushButton" name="openButton">
     <property name="geometry">
      <rect>
@@ -47,7 +50,7 @@
       <property name="geometry">
        <rect>
         <x>749</x>
-        <y>60</y>
+        <y>65</y>
         <width>100</width>
         <height>80</height>
        </rect>
@@ -63,17 +66,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QTextEdit" name="requestIdTextEdit">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>225</width>
-        <height>26</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="reqIdFilterLabel">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -147,31 +140,6 @@
         <height>26</height>
        </rect>
       </property>
-      <item>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>2</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>3</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>4</string>
-       </property>
-      </item>
      </widget>
      <widget class="QListWidget" name="levelListView">
       <property name="geometry">
@@ -183,7 +151,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="levelFilterLabel">
       <property name="geometry">
        <rect>
         <x>270</x>
@@ -196,17 +164,7 @@
        <string>Level</string>
       </property>
      </widget>
-     <widget class="QTextEdit" name="appTextEdit">
-      <property name="geometry">
-       <rect>
-        <x>518</x>
-        <y>30</y>
-        <width>190</width>
-        <height>26</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_4">
+     <widget class="QLabel" name="appLevelLabel">
       <property name="geometry">
        <rect>
         <x>500</x>
@@ -223,7 +181,7 @@
       <property name="geometry">
        <rect>
         <x>482</x>
-        <y>60</y>
+        <y>65</y>
         <width>26</width>
         <height>26</height>
        </rect>
@@ -232,7 +190,7 @@
        <string>-</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_3">
+     <widget class="QLabel" name="userFilterLabel">
       <property name="geometry">
        <rect>
         <x>340</x>
@@ -249,7 +207,7 @@
       <property name="geometry">
        <rect>
         <x>357</x>
-        <y>60</y>
+        <y>65</y>
         <width>120</width>
         <height>80</height>
        </rect>
@@ -272,19 +230,9 @@
       <property name="geometry">
        <rect>
         <x>518</x>
-        <y>60</y>
+        <y>65</y>
         <width>190</width>
         <height>80</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="userTextEdit">
-      <property name="geometry">
-       <rect>
-        <x>357</x>
-        <y>30</y>
-        <width>120</width>
-        <height>26</height>
        </rect>
       </property>
      </widget>
@@ -297,36 +245,6 @@
         <height>26</height>
        </rect>
       </property>
-      <item>
-       <property name="text">
-        <string>POST</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>GET</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>PUT</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>PROPFIND</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>DELETE</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>--</string>
-       </property>
-      </item>
      </widget>
      <widget class="QPushButton" name="appAddButton">
       <property name="geometry">
@@ -345,7 +263,7 @@
       <property name="geometry">
        <rect>
         <x>713</x>
-        <y>60</y>
+        <y>65</y>
         <width>26</width>
         <height>26</height>
        </rect>
@@ -371,7 +289,7 @@
       <property name="geometry">
        <rect>
         <x>854</x>
-        <y>60</y>
+        <y>65</y>
         <width>26</width>
         <height>26</height>
        </rect>
@@ -492,12 +410,61 @@
        </property>
       </column>
      </widget>
-     <widget class="QLabel" name="rowsCountLabel">
+     <widget class="QLabel" name="rowsCompleteCountLabel">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>640</y>
-        <width>231</width>
+        <y>630</y>
+        <width>100</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="userLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>357</x>
+        <y>30</y>
+        <width>120</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="reqIdLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>225</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="appLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>518</x>
+        <y>30</y>
+        <width>190</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="rowsAffectedCountLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>650</y>
+        <width>100</width>
         <height>26</height>
        </rect>
       </property>

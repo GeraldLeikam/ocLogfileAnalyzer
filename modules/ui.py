@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 from modules.QItems import TableItem
 from PyQt5.QtWidgets import QFileDialog
 from os.path import expanduser
@@ -7,6 +8,8 @@ from modules.uiFunctions import setUITitle
 from modules.uiFunctions import readFile
 from modules.uiFunctions import createRecordList
 from modules.uiFunctions import filter
+from modules.uiFunctions import getLengthInPixels
+from threading import Thread
 
 class Ui(QtWidgets.QMainWindow):
 
@@ -30,10 +33,12 @@ class Ui(QtWidgets.QMainWindow):
     def __init__(self, uiTemplate):
         super(Ui, self).__init__() # Call the inherited classes __init__ method
         loadUi(uiTemplate, self) # Load the .ui file
-
         setUITitle(uiElement=self, title=f'{self.title}')
         self.setGUIObjects()
         self.configureTableWidget()
+        self.setLabelText(labelName='rowsCompleteCountLabel', text=f'rows complete: 0')
+        self.setLabelText(labelName='rowsAffectedCountLabel', text=f'rows affected by filter: 0')
+
         self.show()
 
     def setGUIObjects(self):
@@ -42,24 +47,14 @@ class Ui(QtWidgets.QMainWindow):
         self.uiFilterListViews = {
             'reqId': self.findChild(QtWidgets.QListView, 'requestIdListView'),
             'level': self.findChild(QtWidgets.QListView, 'levelListView'),
-            'date': None,
-            'time': None,
-            'remoteAddr': None,
             'user': self.findChild(QtWidgets.QListView, 'userListView'),
             'app': self.findChild(QtWidgets.QListView, 'appsListView'),
             'method': self.findChild(QtWidgets.QListView, 'methodListView'),
-            'url': None,
-            'message': None
         }
-        self.uiFilterTextEdits = {
-            'reqId': self.findChild(QtWidgets.QTextEdit, 'requestIdTextEdit'),
-            'date': None,
-            'time': None,
-            'remoteAddr': None,
-            'user': self.findChild(QtWidgets.QTextEdit, 'userTextEdit'),
-            'app': self.findChild(QtWidgets.QTextEdit, 'appTextEdit'),
-            'url': None,
-            'message': None
+        self.uiFilterLineEdits = {
+            'reqId': self.findChild(QtWidgets.QLineEdit, 'reqIdLineEdit'),
+            'user': self.findChild(QtWidgets.QLineEdit, 'userLineEdit'),
+            'app': self.findChild(QtWidgets.QLineEdit, 'appLineEdit')
         }
         self.uiFilterComboBoxes = {
             'level': self.findChild(QtWidgets.QComboBox, 'levelComboBox'),
@@ -72,7 +67,6 @@ class Ui(QtWidgets.QMainWindow):
             'app': self.findChild(QtWidgets.QPushButton, 'appAddButton'),
             'method': self.findChild(QtWidgets.QPushButton, 'methodAddButton'),
         }
-
         self.uiFilterRemoveButtons = {
             'reqId': self.findChild(QtWidgets.QPushButton, 'requestIdRemoveButton'),
             'level': self.findChild(QtWidgets.QPushButton, 'levelRemoveButton'),
@@ -80,12 +74,14 @@ class Ui(QtWidgets.QMainWindow):
             'app': self.findChild(QtWidgets.QPushButton, 'appRemoveButton'),
             'method': self.findChild(QtWidgets.QPushButton, 'methodRemoveButton')
         }
-
+        self.uiLabels = {
+            'rowsCompleteCountLabel': self.findChild(QtWidgets.QLabel, 'rowsCompleteCountLabel'),
+            'rowsAffectedCountLabel': self.findChild(QtWidgets.QLabel, 'rowsAffectedCountLabel')
+        }
         self.openButton = self.findChild(QtWidgets.QPushButton, 'openButton')
 
         self.filterButton = self.findChild(QtWidgets.QPushButton, 'filterButton')
-
-        self.rowsCountLabel = self.findChild(QtWidgets.QLabel, 'rowsCountLabel')
+        self.filterButton.setDisabled(True)
 
         self.openButton.clicked.connect(self.openButtonFunction)
 
@@ -101,17 +97,33 @@ class Ui(QtWidgets.QMainWindow):
         self.uiFilterRemoveButtons['app'].clicked.connect(lambda: self.removeButtonFunction(filter='app'))
         self.uiFilterRemoveButtons['method'].clicked.connect(lambda: self.removeButtonFunction(filter='method'))
 
+        self.uiFilterLineEdits['reqId'].installEventFilter(self)
+        self.uiFilterLineEdits['user'].installEventFilter(self)
+        self.uiFilterLineEdits['app'].installEventFilter(self)
+
         self.filterButton.clicked.connect(self.filterButtonFunction)
 
-    def configureTableWidget(self):
+    def setLabelText(self, labelName, text):
+        self.uiLabels[labelName].setText(text)
+        self.uiLabels[labelName].resize(getLengthInPixels(txt=text), self.uiLabels[labelName].height())
 
+    def configureTableWidget(self):
+        self.dataTable.clearContents()
         self.dataTable.setColumnCount(len(self.columnHeaders))
         for column in range(0, len(self.columnHeaders)):
             self.dataTable.setHorizontalHeaderItem(column, self.columnHeaders[column])
             self.dataTable.setColumnWidth(column, self.columnHeaders[column].getItemLengthSizeInPixel() + 20)
         self.dataTable.setColumnHidden(0, True)
 
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.KeyPress:
+            if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+                if 'LineEdit' in obj.objectName():
+                    self.addButtonFunction(filter=obj.objectName().replace('LineEdit', ''))
+        return super().eventFilter(obj, event)
+
     def openButtonFunction(self):
+        self.filterButton.setDisabled(True)
         file = QFileDialog.getOpenFileName(self, 'Select LogFile to load', expanduser('~'))[0]
         if file != '':
             setUITitle(self, f'{self.title} - {file}')
@@ -124,16 +136,37 @@ class Ui(QtWidgets.QMainWindow):
                         self.dataGood.append(data)
                     else:
                         self.dataFailed.append(data)
-            self.loadData(dataList=self.dataGood)
+            self.setLevelFilterItems()
+            self.setMethodFilterItems()
+            self.setLabelText(labelName='rowsCompleteCountLabel', text=f'rows complete: {len(self.dataGood)}')
+            Thread(target=self.loadData, args=(self.dataGood, )).start()
+
+    def setLevelFilterItems(self):
+        levels = []
+        for line in self.dataGood:
+            if line.level not in levels:
+                levels.append(line.level)
+                levels.sort()
+        self.uiFilterComboBoxes['level'].clear()
+        self.uiFilterComboBoxes['level'].addItems(levels)
+
+    def setMethodFilterItems(self):
+        methods = []
+        for line in self.dataGood:
+            if line.method not in methods:
+                methods.append(line.method)
+                methods.sort()
+        self.uiFilterComboBoxes['method'].clear()
+        self.uiFilterComboBoxes['method'].addItems(methods)
 
     def addButtonFunction(self, filter=None):
-        if filter in self.uiFilterTextEdits.keys():
-            filterCriteria = self.uiFilterTextEdits[filter].toPlainText()
-            self.uiFilterTextEdits[filter].setText('')
+        filterCriteria = None
+        if filter in self.uiFilterLineEdits.keys():
+            filterCriteria = self.uiFilterLineEdits[filter].text()
+            self.uiFilterLineEdits[filter].clear()
         if filter in self.uiFilterComboBoxes.keys():
             filterCriteria = self.uiFilterComboBoxes[filter].currentText()
             self.uiFilterComboBoxes[filter].setCurrentText(self.uiFilterComboBoxes[filter].itemText(0))
-
         if filterCriteria != '':
             found = False
             for i in range(0, self.uiFilterListViews[filter].count()):
@@ -153,8 +186,9 @@ class Ui(QtWidgets.QMainWindow):
             self.uiFilterListViews[filter].item(0).setSelected(True)
 
     def filterButtonFunction(self):
+        self.filterButton.setDisabled(True)
         if self.dataGood != None:
-
+            dataList = self.dataGood
             filterCriterias = {
                 'reqId': [],
                 'level': [],
@@ -172,8 +206,18 @@ class Ui(QtWidgets.QMainWindow):
                 if self.uiFilterListViews[listView] != None:
                     for row in range(0, self.uiFilterListViews[listView].count()):
                         filterCriterias[listView].append(self.uiFilterListViews[listView].item(row).text())
+            goFiltering = False
+            for criteria in filterCriterias:
+                if len(filterCriterias[criteria]) > 0:
+                    goFiltering = True
+                    break
+            if goFiltering:
+                dataList = filter(data=self.dataGood, filterCriterias=filterCriterias)
+                self.setLabelText(labelName='rowsAffectedCountLabel', text=f'rows affected by filter: {len(dataList)}')
+            else:
+                self.setLabelText(labelName='rowsAffectedCountLabel', text=f'rows affected by filter: 0')
+            Thread(target=self.loadData, args=(dataList,)).start()
 
-            self.loadData(filter(data=self.dataGood, filterCriterias=filterCriterias))
 
     def loadData(self, dataList):
         self.configureTableWidget()
@@ -190,7 +234,6 @@ class Ui(QtWidgets.QMainWindow):
             'url': 0,
             'message': 0
         }
-
         self.dataTable.setRowCount(len(dataList))
         for row in range(0, len(dataList)):
             record = dataList[row]
@@ -200,7 +243,4 @@ class Ui(QtWidgets.QMainWindow):
                 if item.getStringLength() > tableColumns[list(tableColumns)[column]]:
                     tableColumns[list(tableColumns)[column]] = item.getStringLength()
                     self.dataTable.setColumnWidth(column, item.getItemLengthSizeInPixel() + 20)
-
-        self.rowsCountLabel.setText(f'Rows: {len(dataList)}')
-
-
+        self.filterButton.setEnabled(True)

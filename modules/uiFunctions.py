@@ -1,7 +1,16 @@
 from modules.ocRecordObject import ocRecord
+from PyQt5.Qt import QFont
+from PyQt5.Qt import QFontMetrics
 
 def setUITitle(uiElement, title):
     uiElement.setWindowTitle(title)
+
+def getLengthInPixels(fontFamily='Ubuntu', fontSize=10, txt=None):
+    if txt is not None:
+        #fontMetrics = QFontMetrics(QFont(fontFamily, fontSize))
+        #return fontMetrics.width(txt)
+        return QFontMetrics(QFont(fontFamily, fontSize)).width(txt)
+
 
 def readFile(file):
     try:
