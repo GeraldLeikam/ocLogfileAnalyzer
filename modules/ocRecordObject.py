@@ -1,10 +1,12 @@
+from PyQt5.QtWidgets import QTableWidgetItem
 from json import loads
-from modules.QItems import TableItem
+import hashlib
+from time import time
 
 class ocRecord():
 
     originalString = None
-    ID = None
+    recordId = None
     reqId = None
     level = None
     date = None
@@ -18,8 +20,10 @@ class ocRecord():
     parseSuccess = False
 
     def __init__(self, jsonString):
-        self.originalString = jsonString
+
+        self.originalString = jsonString.strip('\n')
         self.parseJsonString(jsonString=jsonString)
+        self.setRecordID()
 
     def parseJsonString(self, jsonString):
         try:
@@ -34,16 +38,22 @@ class ocRecord():
     def getStringLength(self, attribute):
         return len(getattr(self, attribute))
 
-    def getTableItemObject(self, attribute):
-        columnHeader = attribute
-        if attribute == 'remoteAddr':
-            columnHeader = 'remote Address'
-        if attribute == 'reqId':
-            columnHeader = 'Request ID'
-        return TableItem(txt=getattr(self, attribute), tableColumn=columnHeader)
+    def getString(self, attribute):
+        return getattr(self, attribute)
 
-    def setRecordID(self, ID):
-        self.ID = str(ID)
+    def getTableItemObject(self, attribute):
+        item = QTableWidgetItem()
+        item.setText(getattr(self, attribute))
+        return item
+
+
+    def setRecordID(self, recordId=None):
+        if recordId != None:
+            self.recordId = str(recordId)
+        else:
+            idString = f'{time()}{self.originalString}{self.reqId}{self.level}{self.date}{self.time}{self.remoteAddr}{self.user}{self.app}{self.method}{self.url}{self.message}'
+            self.recordId = idString = hashlib.md5(idString.encode('utf-8')).hexdigest()
+
 
 if __name__ == '__main__':
     pass

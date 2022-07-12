@@ -17,7 +17,7 @@
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <widget class="QPushButton" name="openButton">
+   <widget class="QPushButton" name="openFileButton">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -46,7 +46,82 @@
      <attribute name="title">
       <string>Parsed Lines</string>
      </attribute>
-     <widget class="QListWidget" name="methodListView">
+     <widget class="QLineEdit" name="reqIdLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>225</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="levelComboBox">
+      <property name="geometry">
+       <rect>
+        <x>276</x>
+        <y>30</y>
+        <width>40</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="userLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>357</x>
+        <y>30</y>
+        <width>120</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="appLineEdit">
+      <property name="geometry">
+       <rect>
+        <x>518</x>
+        <y>30</y>
+        <width>190</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="methodComboBox">
+      <property name="geometry">
+       <rect>
+        <x>749</x>
+        <y>30</y>
+        <width>100</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="filterButton">
+      <property name="geometry">
+       <rect>
+        <x>860</x>
+        <y>110</y>
+        <width>90</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Filter</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="methodListWidget">
       <property name="geometry">
        <rect>
         <x>749</x>
@@ -55,8 +130,11 @@
         <height>80</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
      </widget>
-     <widget class="QListWidget" name="requestIdListView">
+     <widget class="QListWidget" name="reqIdListWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -64,6 +142,9 @@
         <width>225</width>
         <height>80</height>
        </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
      </widget>
      <widget class="QLabel" name="reqIdFilterLabel">
@@ -79,7 +160,7 @@
        <string>Request ID</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="requestIdAddButton">
+     <widget class="QPushButton" name="reqIdAddButton">
       <property name="geometry">
        <rect>
         <x>240</x>
@@ -88,11 +169,14 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string>+</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="requestIdRemoveButton">
+     <widget class="QPushButton" name="reqIdRemoveButton">
       <property name="geometry">
        <rect>
         <x>240</x>
@@ -100,6 +184,9 @@
         <width>26</width>
         <height>26</height>
        </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string>-</string>
@@ -114,6 +201,9 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string>-</string>
       </property>
@@ -127,21 +217,14 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string>+</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="levelComboBox">
-      <property name="geometry">
-       <rect>
-        <x>276</x>
-        <y>30</y>
-        <width>40</width>
-        <height>26</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="levelListView">
+     <widget class="QListWidget" name="levelListWidget">
       <property name="geometry">
        <rect>
         <x>276</x>
@@ -149,6 +232,9 @@
         <width>40</width>
         <height>80</height>
        </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
      </widget>
      <widget class="QLabel" name="levelFilterLabel">
@@ -186,6 +272,9 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string>-</string>
       </property>
@@ -203,7 +292,7 @@
        <string>User</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="userListView">
+     <widget class="QListWidget" name="userListWidget">
       <property name="geometry">
        <rect>
         <x>357</x>
@@ -211,6 +300,9 @@
         <width>120</width>
         <height>80</height>
        </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
      </widget>
      <widget class="QPushButton" name="userAddButton">
@@ -222,11 +314,14 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string>+</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="appsListView">
+     <widget class="QListWidget" name="appListWidget">
       <property name="geometry">
        <rect>
         <x>518</x>
@@ -235,15 +330,8 @@
         <height>80</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QComboBox" name="methodComboBox">
-      <property name="geometry">
-       <rect>
-        <x>749</x>
-        <y>30</y>
-        <width>100</width>
-        <height>26</height>
-       </rect>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
      </widget>
      <widget class="QPushButton" name="appAddButton">
@@ -254,6 +342,9 @@
         <width>26</width>
         <height>26</height>
        </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string>+</string>
@@ -268,6 +359,9 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string>-</string>
       </property>
@@ -280,6 +374,9 @@
         <width>26</width>
         <height>26</height>
        </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
       </property>
       <property name="text">
        <string>+</string>
@@ -294,21 +391,11 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
       <property name="text">
        <string>-</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="filterButton">
-      <property name="geometry">
-       <rect>
-        <x>860</x>
-        <y>110</y>
-        <width>90</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Filter</string>
       </property>
      </widget>
      <widget class="QTableWidget" name="dataTable">
@@ -327,88 +414,8 @@
        <enum>QAbstractItemView::ScrollPerPixel</enum>
       </property>
       <property name="sortingEnabled">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
-      <column>
-       <property name="text">
-        <string>Request ID</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Level</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Date</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Time</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Remote Address</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>User</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>App</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Method</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Url</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Message</string>
-       </property>
-       <property name="textAlignment">
-        <set>AlignJustify|AlignVCenter</set>
-       </property>
-      </column>
      </widget>
      <widget class="QLabel" name="rowsCompleteCountLabel">
       <property name="geometry">
@@ -421,42 +428,6 @@
       </property>
       <property name="text">
        <string/>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="userLineEdit">
-      <property name="geometry">
-       <rect>
-        <x>357</x>
-        <y>30</y>
-        <width>120</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="clearButtonEnabled">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="reqIdLineEdit">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>225</width>
-        <height>26</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="appLineEdit">
-      <property name="geometry">
-       <rect>
-        <x>518</x>
-        <y>30</y>
-        <width>190</width>
-        <height>26</height>
-       </rect>
       </property>
      </widget>
      <widget class="QLabel" name="rowsAffectedCountLabel">
@@ -472,15 +443,52 @@
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="exportButton">
+      <property name="geometry">
+       <rect>
+        <x>790</x>
+        <y>640</y>
+        <width>90</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Export</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
       <string>Parsed failed</string>
      </attribute>
+     <widget class="QListWidget" name="parsedFailedListWidget">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>21</y>
+        <width>1861</width>
+        <height>611</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
+   <widget class="QLabel" name="statusLabel">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>5</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>tabWidget</zorder>
-   <zorder>openButton</zorder>
+   <zorder>openFileButton</zorder>
+   <zorder>statusLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

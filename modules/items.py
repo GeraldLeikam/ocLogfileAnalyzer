@@ -13,6 +13,30 @@ Alignments
 4:centre
 """
 
+class TabelColumnHeaderItem(QTableWidgetItem):
+
+    text = None
+
+    def __init__(self, txt=None, font=None):
+        super().__init__()
+        self.text = txt
+        self.setText(self.text)
+        self.setFont(font)
+        self.setTextAlignment(0)
+
+    def getTextLength(self):
+        if self.text is not None:
+            return len(self.text)
+        else:
+            return 0
+
+    def getText(self):
+        return self.text
+
+    def updateText(self, text=None):
+        if text is not None:
+            self.setText(text)
+
 class TableItem(QTableWidgetItem):
 
     def __init__(self, txt='', fontFamily='Ubuntu', fontSize=10, setBold=False, color=QColor(0, 0, 0), alignment=0, tableColumn=None):
@@ -29,22 +53,3 @@ class TableItem(QTableWidgetItem):
         self.setForeground(color)
         self.setFont(self.font)
         self.setText(self.txt)
-
-    def getStringLength(self):
-        if self.txt == '':
-            return len(self.tableColumn)
-        else:
-            if len(self.txt) > len(self.tableColumn):
-                return len(self.txt)
-            else:
-                return len(self.tableColumn)
-
-    def getItemLengthSizeInPixel(self):
-        fontMetrics = QFontMetrics(self.font)
-        if self.txt == '' or self.txt == None:
-            return fontMetrics.width(self.tableColumn)
-        else:
-            if len(self.txt) > len(self.tableColumn):
-                return fontMetrics.width(self.txt)
-            else:
-                return fontMetrics.width(self.tableColumn)

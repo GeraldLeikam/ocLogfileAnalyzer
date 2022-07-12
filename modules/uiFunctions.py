@@ -1,4 +1,7 @@
+from PyQt5.QtWidgets import QFileDialog
+
 from modules.ocRecordObject import ocRecord
+from os.path import expanduser
 from PyQt5.Qt import QFont
 from PyQt5.Qt import QFontMetrics
 
@@ -42,3 +45,6 @@ def filter(data, filterCriterias):
                         tempData.append(dataList[row])
             dataList = tempData
     return dataList
+
+def getFileNameFromFileDialog(ui):
+    file = QFileDialog.getOpenFileName(ui, 'Select LogFile to load', expanduser('~'))[0]
