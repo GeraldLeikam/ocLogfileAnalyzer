@@ -19,8 +19,10 @@ class Application:
 
     def getPath(self):
         path = __file__.strip(__file__.split('/')[len(__file__.split('/')) - 1])
+        if '/tmp/' in path:
+            path = f'{path}ocLogfileAnalyzer'
         print(path)
-
+        
     def execApp(self):
         sys.exit(self.app.exec_())
 
