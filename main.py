@@ -20,7 +20,7 @@ class Application:
     def getPath(self):
         path = __file__.strip(__file__.split('/')[len(__file__.split('/')) - 1])
         if '/tmp/' in path:
-            path = f'{path[:-1]}ocLogfileAnalyzer'
+            path = f'{path[:-1]}ocLogfileAnalyzer/'
         print(path)
         return path
 
