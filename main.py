@@ -7,29 +7,25 @@ class Application:
 
     resultStorage = []
 
-    def __init__(self):
-        self.createApp()
-        self.execApp()
+    def __init__(self, uiPath):
+        self.getPath()
+        #self.createApp(uiPath=uiPath)
+        #self.execApp()
 
-    def createApp(self):
+    def createApp(self, uiPath):
         self.app = QApplication(sys.argv)
         path = __file__.strip(__file__.split('/')[len(__file__.split('/')) - 1])
         self.window = Ui(uiTemplate=f'{path}ui/main.ui')
+
+    def getPath(self):
+        path = __file__.strip(__file__.split('/')[len(__file__.split('/')) - 1])
+        print(path)
 
     def execApp(self):
         sys.exit(self.app.exec_())
 
 if __name__ == '__main__':
-    Application()
-    """
-    path = __file__.strip(__file__.split('/')[len(__file__.split('/'))-1]) # absolute path
-    app = QtWidgets.QApplication(sys.argv)
-    try:
-        window = Ui(uiTemplate=f'{path}ui/main.ui')
-    except:
-        path = f'{path}/ocLogfileAnalyzer' # absolute path for appImage
-        window = Ui(uiTemplate=f'{path}/ui/main.ui')
-    sys.exit(app.exec_())
-    """
+    Application(uiPath=None)
+
 
 
