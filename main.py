@@ -5,30 +5,26 @@ from modules.ui import Ui
 
 class Application:
 
-    resultStorage = []
-
-    def __init__(self, uiPath):
+    def __init__(self):
         self.getPath()
-        self.createApp(uiPath=uiPath)
+        self.createApp()
         self.execApp()
 
-    def createApp(self, uiPath):
+    def createApp(self):
         self.app = QApplication(sys.argv)
-        path = __file__.strip(__file__.split('/')[len(__file__.split('/')) - 1])
         self.window = Ui(uiTemplate=f'{self.getPath()}ui/main.ui')
 
     def getPath(self):
         path = __file__.strip(__file__.split('/')[len(__file__.split('/')) - 1])
         if '/tmp/' in path:
             path = f'{path[:-1]}ocLogfileAnalyzer/'
-        print(path)
         return path
 
     def execApp(self):
         sys.exit(self.app.exec_())
 
 if __name__ == '__main__':
-    Application(uiPath=None)
+    Application()
 
 
 

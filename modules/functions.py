@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QListWidget
 from PyQt5.QtWidgets import QTableWidget
 from PyQt5.QtWidgets import QTableWidgetItem
 
+
 from os.path import exists
 from os.path import expanduser
 
@@ -29,6 +30,7 @@ class Functions():
     class App:
 
         fileData = None
+        currentDisplayedData = []
         filteringInProgress = False
         tableColumns = [
             'recordId',
@@ -98,6 +100,7 @@ class Functions():
                 self.Functions.Qt.Label.setText(labelName='statusLabel', text=f'status: data loaded ...  100%', resizeWidth=True)
                 self.Functions.Qt.Label.setText(labelName='rowsCompleteCountLabel', text=f'rows complete: {len(self.fileData)}', resizeWidth=True)
                 self.Functions.Qt.Button.activate(buttonName='filterButton')
+                self.currentDisplayedData = self.fileData
 
         def setComboBoxFilterItems(self, comboBoxNames, data, attributes):
             filterItems = {}
@@ -172,6 +175,7 @@ class Functions():
             self.loadDataIntoTable(tableName='dataTable', data=data)
             self.activateButtonsAfterFiltering()
             self.filteringInProgress = False
+            self.currentDisplayedData = data
 
         def deactivateButtonsWhileFiltering(self):
             buttons = [
@@ -219,18 +223,15 @@ class Functions():
             return filterCriterias
 
         def exportRecords(self):
-            data = self.remmoveDuplicates(self.Functions.Qt.Table.getSelectedItems(tableName='dataTable'))
+            data = self.Functions.Qt.Table.getSelectedIndexes(tableName='dataTable')
             if len(data) > 0:
-                recordStrings = []
-                for index in data:
-                    for record in self.fileData:
-                        if record.recordId.lower() == self.Functions.Qt.Table.getItemText(tableName='dataTable', row=index,column=0).lower():
-                            recordStrings.append(record.originalString)
+                self.Functions.Qt.Button.deactivate(buttonName='exportButton')
                 fileName = self.Functions.Qt.FileDialog.getSaveFileDialog()
                 if fileName != '':
                     with open(fileName, 'w') as writer:
-                        for record in recordStrings:
-                            writer.write(record + '\n')
+                        for index in data:
+                            writer.write(f'{self.currentDisplayedData[index.row()].originalString}\n')
+                self.Functions.Qt.Button.activate(buttonName='exportButton')
 
         def remmoveDuplicates(self, data):
             tempData = []
@@ -297,6 +298,14 @@ class Functions():
 
             def addClickedConnection(self, buttonName, connectFunction):
                 self.Qt.getObject(objectType=QPushButton, objectName=buttonName).clicked.connect(connectFunction)
+
+            def deactivateButtons(self, buttonList):
+                for button in buttonList:
+                    self.deactivate(buttonName=button)
+
+            def activateButtons(self, buttonList):
+                for button in buttonList:
+                    self.activate(buttonName=button)
 
         class ComboBox:
 
@@ -416,6 +425,9 @@ class Functions():
 
             def getItemText(self, tableName, row, column):
                 return self.Qt.getObject(objectType=QTableWidget, objectName=tableName).item(row, column).text()
+
+            def getSelectedIndexes(self, tableName):
+                return self.Qt.getObject(objectType=QTableWidget, objectName=tableName).selectionModel().selectedRows()
 
             class Column:
 
